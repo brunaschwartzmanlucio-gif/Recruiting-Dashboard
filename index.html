@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Recruiting Dashboard — Bruna</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,sans-serif;background:#0f0f11;color:#f0ede8;font-size:13px}
+header{padding:16px 20px;background:#18181b;border-bottom:1px solid #2a2a2e;display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between}
+header h1{font-size:18px;font-style:italic;color:#c4b5fd}
+.stats{display:flex;gap:16px;align-items:center}
+.stat{text-align:right}.sn{font-size:22px;font-weight:700;color:#c4b5fd;line-height:1}.sl{font-size:9px;color:#888;text-transform:uppercase;letter-spacing:.07em}
+.div{width:1px;height:26px;background:#2a2a2e}
+.btn-new{padding:6px 14px;border:1px solid #c4b5fd;border-radius:7px;background:transparent;color:#c4b5fd;cursor:pointer;font-size:12px}
+.btn-new:hover{background:rgba(196,181,253,.12)}
+.progbar{padding:8px 20px;background:#18181b;border-bottom:1px solid #2a2a2e;display:flex;align-items:center;gap:10px}
+.ptrack{flex:1;height:3px;background:#2a2a2e;border-radius:2px;overflow:hidden}
+.pfill{height:100%;background:#c4b5fd;border-radius:2px;transition:width .4s}
+.plbl{font-size:10px;color:#888;min-width:80px}
+.ppct{font-size:10px;color:#c4b5fd;min-width:30px;text-align:right}
+.layout{display:flex;min-height:calc(100vh - 80px)}
+.sidebar{width:160px;flex-shrink:0;background:#18181b;border-right:1px solid #2a2a2e;padding:12px 0}
+.sg{padding:0 8px;margin-bottom:14px}
+.st{font-size:9px;color:#666;text-transform:uppercase;letter-spacing:.1em;margin-bottom:5px;padding:0 4px}
+.sf{display:flex;align-items:center;gap:6px;width:100%;padding:5px 8px;border-radius:6px;border:none;background:transparent;color:#a0a0a8;font-size:11px;cursor:pointer;text-align:left;margin-bottom:1px}
+.sf:hover,.sf.on{background:#222228;color:#f0ede8}
+.dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+.cnt{margin-left:auto;font-size:9px;color:#666;background:#0f0f11;padding:1px 5px;border-radius:8px}
+.main{flex:1;padding:16px 20px}
+.ph-hdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid #2a2a2e}
+.ph-title{font-size:15px;font-weight:600}.ph-sub{font-size:10px;color:#666;margin-top:2px}
+.ph-cnt{font-size:10px;background:#222228;padding:2px 8px;border-radius:10px;color:#888}
+.tasks{display:flex;flex-direction:column;gap:5px;margin-bottom:24px}
+.card{background:#18181b;border:1px solid #2a2a2e;border-radius:9px;padding:10px 12px;display:flex;gap:9px;transition:border-color .15s}
+.card:hover{border-color:#3a3a42}
+.card.done{opacity:.35}
+.cb{width:18px;height:18px;min-width:18px;border-radius:5px;border:1.5px solid #444;background:transparent;margin-top:1px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff;transition:all .15s;flex-shrink:0}
+.cb:hover{border-color:#c4b5fd}
+.cb.on{background:#c4b5fd;border-color:#c4b5fd}
+.bd{flex:1;min-width:0}
+.tr{display:flex;flex-wrap:wrap;gap:5px;align-items:flex-start;margin-bottom:3px}
+.ttl{font-size:13px;font-weight:500;line-height:1.4}.done .ttl{text-decoration:line-through;color:#666}
+.tag{font-size:9px;padding:2px 6px;border-radius:3px;font-weight:600;text-transform:uppercase;letter-spacing:.04em;white-space:nowrap}
+.desc{font-size:11.5px;color:#a0a0a8;line-height:1.5}
+.dbar{display:flex;align-items:center;gap:7px;margin-top:5px}
+.dtrack{flex:1;height:2px;background:#222228;border-radius:1px}
+.dfill{height:100%;border-radius:1px;background:#c4b5fd;opacity:.35}
+.dlbl{font-size:9px;color:#666;white-space:nowrap}
+.nbox{margin-top:5px;font-size:10px;color:#a78bfa;background:rgba(167,139,250,.08);border-left:2px solid #a78bfa;padding:4px 8px}
+.acts{display:flex;gap:5px;margin-top:7px;flex-wrap:wrap;align-items:center}
+.ab{font-size:10px;padding:3px 7px;border-radius:4px;border:1px solid #333;background:transparent;color:#a0a0a8;cursor:pointer}
+.ab:hover{border-color:#c4b5fd;color:#c4b5fd}
+.ab.red:hover{border-color:#f87171;color:#f87171}
+.dl{margin-left:auto;font-size:9px;color:#666}
+.dl.hi{color:#f87171}.dl.md{color:#fb923c}
+.ov{position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:100;display:flex;align-items:center;justify-content:center;padding:16px}
+.mb{background:#18181b;border:1px solid #333;border-radius:12px;width:100%;max-width:460px;padding:22px;max-height:90vh;overflow-y:auto}
+.mt{font-size:16px;font-weight:600;margin-bottom:3px}
+.ms{font-size:11px;color:#888;margin-bottom:14px}
+.mn{background:#222228;border:1px solid #2a2a2e;border-radius:7px;padding:7px 11px;font-size:12px;color:#c4b5fd;font-style:italic;margin-bottom:14px}
+.ml{display:block;font-size:9px;color:#666;text-transform:uppercase;letter-spacing:.08em;margin-bottom:5px;margin-top:12px}
+select,input[type=text],input[type=number],textarea{width:100%;background:#222228;border:1px solid #333;border-radius:7px;color:#f0ede8;font-family:-apple-system,sans-serif;font-size:12px;padding:7px 10px;outline:none;-webkit-appearance:none;appearance:none}
+textarea{resize:vertical;min-height:65px}
+.macts{display:flex;gap:8px;justify-content:flex-end;margin-top:16px}
+.mcc{padding:7px 14px;border-radius:7px;border:1px solid #333;background:transparent;color:#888;cursor:pointer;font-size:12px}
+.mok{padding:7px 14px;border-radius:7px;border:none;background:#c4b5fd;color:#000;cursor:pointer;font-size:12px;font-weight:700}
+.chips{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:4px}
+.ch{padding:4px 9px;border-radius:5px;border:1px solid #333;background:transparent;color:#888;cursor:pointer;font-size:11px}
+.ch.on{border-color:#4ade80;color:#4ade80;background:rgba(74,222,128,.08)}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:10px}
+#toast{position:fixed;bottom:20px;right:20px;background:#222228;border:1px solid #333;border-radius:9px;padding:10px 16px;font-size:12px;color:#f0ede8;z-index:200;display:none;box-shadow:0 8px 24px rgba(0,0,0,.5)}
+.empty{text-align:center;padding:40px;color:#666}
+</style>
+</head>
+<body>
+
+<header>
+  <div>
+    <h1>Recruiting Dashboard</h1>
+    <div style="font-size:9px;color:#666;margin-top:2px;text-transform:uppercase;letter-spacing:.06em">Wharton '29 — IB New York</div>
+  </div>
+  <div class="stats">
+    <div class="stat"><div class="sn" id="s-done">0</div><div class="sl">concluídas</div></div>
+    <div class="div"></div>
+    <div class="stat"><div class="sn" id="s-total">0</div><div class="sl">total</div></div>
+    <div class="div"></div>
+    <div class="stat"><div class="sn" id="s-urg">0</div><div class="sl">urgentes</div></div>
+    <div class="div"></div>
+    <div class="stat"><div class="sn" id="s-hrs">0h</div><div class="sl">restantes</div></div>
+    <div class="div"></div>
+    <button class="btn-new" onclick="openAdd()">+ nova tarefa</button>
+  </div>
+</header>
+
+<div class="progbar">
+  <span class="plbl" id="p-lbl">0 / 0 tarefas</span>
+  <div class="ptrack"><div class="pfill" id="p-fill" style="width:0%"></div></div>
+  <span class="ppct" id="p-pct">0%</span>
+</div>
+
+<div class="layout">
+  <div class="sidebar">
+    <div class="sg">
+      <div class="st">Fase</div>
+      <button class="sf on" onclick="setF('pf','all',this)"><span class="dot" style="background:#666"></span>Todas<span class="cnt" id="c-all">33</span></button>
+      <button class="sf" onclick="setF('pf','jun-jul',this)"><span class="dot" style="background:#f87171"></span>Jun — Jul<span class="cnt" id="c-jj">0</span></button>
+      <button class="sf" onclick="setF('pf','agosto',this)"><span class="dot" style="background:#fb923c"></span>Agosto<span class="cnt" id="c-ag">0</span></button>
+      <button class="sf" onclick="setF('pf','set-out',this)"><span class="dot" style="background:#4ade80"></span>Set — Out<span class="cnt" id="c-so">0</span></button>
+      <button class="sf" onclick="setF('pf','nov-fev',this)"><span class="dot" style="background:#c4b5fd"></span>Nov — Fev<span class="cnt" id="c-nf">0</span></button>
+    </div>
+    <div class="sg">
+      <div class="st">Categoria</div>
+      <button class="sf on" onclick="setF('cf','all',this)"><span class="dot" style="background:#666"></span>Todas</button>
+      <button class="sf" onclick="setF('cf','cv',this)"><span class="dot" style="background:#c084fc"></span>CV & Perfil</button>
+      <button class="sf" onclick="setF('cf','networking',this)"><span class="dot" style="background:#60a5fa"></span>Networking</button>
+      <button class="sf" onclick="setF('cf','programas',this)"><span class="dot" style="background:#c4b5fd"></span>Programas</button>
+      <button class="sf" onclick="setF('cf','clubes',this)"><span class="dot" style="background:#4ade80"></span>Clubes</button>
+      <button class="sf" onclick="setF('cf','leitura',this)"><span class="dot" style="background:#f87171"></span>Leituras</button>
+      <button class="sf" onclick="setF('cf','tecnico',this)"><span class="dot" style="background:#fb923c"></span>Prep Técnico</button>
+    </div>
+    <div class="sg">
+      <div class="st">Status</div>
+      <button class="sf on" onclick="setF('sf','all',this)"><span class="dot" style="background:#666"></span>Todas</button>
+      <button class="sf" onclick="setF('sf','pending',this)"><span class="dot" style="background:#444"></span>Pendentes</button>
+      <button class="sf" onclick="setF('sf','done',this)"><span class="dot" style="background:#4ade80"></span>Concluídas</button>
+    </div>
+  </div>
+  <div class="main" id="main"></div>
+</div>
+
+<div class="ov" id="modal" style="display:none" onclick="if(event.target===this)closeModal()">
+  <div class="mb" id="modal-box"></div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+var TASKS=[
+  {id:1,ph:'jun-jul',cat:'leitura',title:'Terminar Why Men Love Bitches',desc:'Já começou — fechar antes do semestre. Leitura leve, ideal para a viagem.',urg:'hi',dl:'Jul 31',dur:4,dt:'único'},
+  {id:2,ph:'jun-jul',cat:'cv',title:'Refinar CV com action words',desc:'Cada bullet: verbo forte + métrica. Usar CV da Martina como referência.',urg:'hi',dl:'Jul 15',dur:3,dt:'único'},
+  {id:3,ph:'jun-jul',cat:'tecnico',title:'Terminar curso de Excel',desc:'Fechar o curso antes de agosto. Excel avançado (pivot, VLOOKUP, index/match) é esperado em qualquer entrevista técnica.',urg:'hi',dl:'Jul 31',dur:12,dt:'único'},
+  {id:4,ph:'jun-jul',cat:'tecnico',title:'Basic accounting — 3 statements',desc:'Income statement, balance sheet, cash flow como se conectam. CFI tem módulo gratuito.',urg:'hi',dl:'Jul 31',dur:6,dt:'único'},
+  {id:5,ph:'jun-jul',cat:'tecnico',title:'Basic valuation (DCF, comps)',desc:'Entender a lógica de DCF, trading comps e precedent transactions. BIWS tem intro grátis.',urg:'hi',dl:'Jul 31',dur:8,dt:'único'},
+  {id:6,ph:'jun-jul',cat:'programas',title:'Pesquisar diversity e women programs',desc:'GS Possibilities, JPM Launching Leaders, MS Early Insights, Citi Early ID, Girls Who Invest.',urg:'hi',dl:'Jul 15',dur:2,dt:'único'},
+  {id:7,ph:'jun-jul',cat:'networking',title:'Iniciar networking — brasileiros em IB',desc:'LinkedIn: Wharton + Brasil + banco alvo. 5 mensagens por semana, curtas e diretas.',urg:'hi',dl:'Contínuo',dur:1,dt:'semanal'},
+  {id:8,ph:'jun-jul',cat:'networking',title:'Contato via Martina para Safra',desc:'Pedir intro diretamente. Mensagem curta, contexto claro, proposta de 20 min.',urg:'hi',dl:'Esta semana',dur:0.5,dt:'único'},
+  {id:9,ph:'agosto',cat:'leitura',title:'Começar Investment Banking (Rosenbaum)',desc:'Foca caps. 1-4: valuation, DCF, LBO basics. Lê em paralelo com Know Theory.',urg:'md',dl:'Ago 1',dur:3,dt:'semanal'},
+  {id:10,ph:'agosto',cat:'tecnico',title:'Know Theory Finance — 30 questões',desc:'Mínimo 30 questões antes dos calls. Foco: accounting + valuation básico.',urg:'md',dl:'Ago 15',dur:5,dt:'único'},
+  {id:11,ph:'agosto',cat:'networking',title:'Coffee chats — 3 por semana',desc:'Calls com contatos do LinkedIn. Perguntas prontas. Aparecer antes do semestre.',urg:'md',dl:'Ago 1',dur:2,dt:'semanal'},
+  {id:12,ph:'agosto',cat:'cv',title:'Mock interviews com Career Services',desc:'Agendar antes do semestre. Behavioral + technicals básicos. Falar em voz alta.',urg:'md',dl:'Ago 20',dur:2,dt:'único'},
+  {id:13,ph:'agosto',cat:'cv',title:'Montar tracker de programas e deadlines',desc:'Planilha: programa, banco, deadline, status, contato. Cadastrar no Coffee Chat by Adventis.',urg:'md',dl:'Ago 1',dur:2,dt:'único'},
+  {id:14,ph:'agosto',cat:'cv',title:'Otimizar LinkedIn para recruiting',desc:'Headline clara, summary com narrative, experiências alinhadas com IB. Antes dos calls.',urg:'md',dl:'Ago 10',dur:3,dt:'único'},
+  {id:15,ph:'agosto',cat:'clubes',title:'Aplicar: WUREC + WITG Accelerator',desc:'Confirmar datas de aplicação de agosto. São os dois clubes mais estratégicos.',urg:'md',dl:'Ago',dur:3,dt:'único'},
+  {id:16,ph:'agosto',cat:'cv',title:'Banco de histórias STAR',desc:'Riza, CBRE, Vai Vencer: 2-3 histórias cada no formato Situation-Task-Action-Result.',urg:'md',dl:'Ago 20',dur:4,dt:'único'},
+  {id:17,ph:'agosto',cat:'cv',title:'Adicionar Tri Delta ao CV',desc:'Sororities têm peso em recruiting. Se tiver cargo dentro da Tri Delta, destacar.',urg:'md',dl:'Ago 10',dur:0.5,dt:'único'},
+  {id:18,ph:'set-out',cat:'programas',title:'Aplicar: Girls Who Invest',desc:'Deadline: 1 de outubro. Sophomore Internship Track = estágio remunerado em partner firms.',urg:'md',dl:'1 Out',dur:3,dt:'único'},
+  {id:19,ph:'set-out',cat:'programas',title:'Aplicar: ibRecruit',desc:'Mentoria pro bono de bankers para candidatas diversas. admin@ibrecruit.com',urg:'md',dl:'Set',dur:1,dt:'único'},
+  {id:20,ph:'set-out',cat:'clubes',title:'Aplicar: 20 clubes em Penn',desc:'Energy Club, Agribusiness, Tart Magazine, Wharton Retail, Penn Sustainability e outros.',urg:'md',dl:'Set',dur:6,dt:'único'},
+  {id:21,ph:'set-out',cat:'leitura',title:'Ler The McKinsey Way',desc:'Leitura rápida cerca de 200 páginas. Estruturar raciocínio para qualquer entrevista.',urg:'lo',dl:'Out',dur:5,dt:'único'},
+  {id:22,ph:'set-out',cat:'networking',title:'The Walk — networking presencial',desc:'Evento de Penn com recruiters. 30-second pitch preparado.',urg:'md',dl:'Set',dur:3,dt:'único'},
+  {id:23,ph:'set-out',cat:'tecnico',title:'Aprofundar technicals — 100+ questões Know Theory',desc:'Foco em LBO basics e enterprise value. Antes dos Superdays de jan-fev.',urg:'md',dl:'Out',dur:2,dt:'semanal'},
+  {id:24,ph:'set-out',cat:'tecnico',title:'Acompanhar deal news — 15 min por dia',desc:'Discuss a deal in the news é pergunta clássica. FT, WSJ, Bloomberg Línea.',urg:'lo',dl:'Contínuo',dur:2,dt:'semanal'},
+  {id:25,ph:'set-out',cat:'cv',title:'Explorar TA e tutoria Penn Language Center',desc:'Tutoria de português/espanhol é a opção mais fácil de encaixar na agenda.',urg:'lo',dl:'Set',dur:2,dt:'único'},
+  {id:26,ph:'set-out',cat:'cv',title:'Procurar internship pelo Penn Workday',desc:'Internships dentro da Penn contam como experiência e são mais fáceis de conseguir.',urg:'lo',dl:'Set',dur:2,dt:'único'},
+  {id:27,ph:'nov-fev',cat:'programas',title:'Aplicar: GS Possibilities Series',desc:'Abre em fevereiro. Um dos programas mais competitivos.',urg:'lo',dl:'Fev',dur:3,dt:'único'},
+  {id:28,ph:'nov-fev',cat:'programas',title:'Aplicar: MS Early Insights + Citi Early ID',desc:'MS abre em janeiro, Citi em fevereiro. CV e STAR stories prontos meses antes.',urg:'lo',dl:'Jan-Fev',dur:4,dt:'único'},
+  {id:29,ph:'nov-fev',cat:'leitura',title:'Terminar Investment Banking (Rosenbaum)',desc:'Caps de M&A, DCF detalhado, LBO. Lê em paralelo com prep de Superdays.',urg:'lo',dl:'Nov',dur:3,dt:'semanal'},
+  {id:30,ph:'nov-fev',cat:'leitura',title:'Case in Point se consulting ativo',desc:'10-15 cases práticos com parceiro. Só entra se consulting for real.',urg:'lo',dl:'Nov',dur:10,dt:'único'},
+  {id:31,ph:'nov-fev',cat:'programas',title:'Superdays — bulge brackets',desc:'GS, JPM, MS: Superdays para internship junior rodam jan-maio.',urg:'lo',dl:'Jan-Mai',dur:8,dt:'único'},
+  {id:32,ph:'nov-fev',cat:'networking',title:'Bancos brasileiros NY — Itaú, BTG, Safra',desc:'Menor concorrência, sponsorship mais acessível, origem é vantagem competitiva.',urg:'lo',dl:'Contínuo',dur:1,dt:'semanal'},
+  {id:33,ph:'nov-fev',cat:'networking',title:'Continuar coffee chats — 2 por semana',desc:'Não para depois de conseguir o primeiro programa. Alumni lembram de quem faz follow-up.',urg:'lo',dl:'Contínuo',dur:2,dt:'semanal'}
+];
+
+var PL={'jun-jul':'Jun — Jul','agosto':'Agosto','set-out':'Set — Out','nov-fev':'Nov — Fev'};
+var PC={'jun-jul':'#f87171','agosto':'#fb923c','set-out':'#4ade80','nov-fev':'#c4b5fd'};
+var CL={cv:'CV & Perfil',networking:'Networking',programas:'Programas',clubes:'Clubes',leitura:'Leituras',tecnico:'Prep Técnico'};
+var CC={cv:'#c084fc',networking:'#60a5fa',programas:'#c4b5fd',clubes:'#4ade80',leitura:'#f87171',tecnico:'#fb923c'};
+var CHIPS=['Explicar o que é','Como começar','Exemplo prático','Template/modelo','Recursos e links','Estratégia detalhada'];
+
+// State
+var done={}, resch={}, notes={}, custom=[];
+var pf='all', cf='all', sf='all';
+var modalType=null, modalId=null;
+var rPhase='jun-jul', rNote='', hChips=[], hNote='';
+var nid=1000;
+
+// Load from localStorage
+try {
+  var saved=JSON.parse(localStorage.getItem('rdb4')||'{}');
+  done=saved.done||{};
+  resch=saved.resch||{};
+  notes=saved.notes||{};
+  custom=saved.custom||[];
+} catch(e){}
+
+function save(){
+  try{ localStorage.setItem('rdb4',JSON.stringify({done:done,resch:resch,notes:notes,custom:custom})); }catch(e){}
+}
+
+function allT(){ return TASKS.concat(custom); }
+function getP(t){ return resch[t.id]||t.ph; }
+function durL(t){
+  if(!t.dur) return '';
+  var h=t.dur<1?Math.round(t.dur*60)+'min':t.dur+'h';
+  return h+(t.dt==='semanal'?'/sem':t.dt==='diário'?'/dia':'');
+}
+
+var toastT;
+function toast(m){
+  var e=document.getElementById('toast');
+  e.textContent=m; e.style.display='block';
+  clearTimeout(toastT);
+  toastT=setTimeout(function(){e.style.display='none';},2000);
+}
+
+function tick(id){
+  done[id]=!done[id];
+  if(done[id]) toast('Concluída!');
+  save(); render();
+}
+
+function setF(key,val,btn){
+  if(key==='pf') pf=val;
+  else if(key==='cf') cf=val;
+  else if(key==='sf') sf=val;
+  var group=btn.parentElement.querySelectorAll('.sf');
+  group.forEach(function(b){b.classList.remove('on');});
+  btn.classList.add('on');
+  render();
+}
+
+function openResch(id){
+  modalType='resch'; modalId=id;
+  rPhase=getP(allT().find(function(t){return String(t.id)===String(id);}));
+  rNote='';
+  showModal();
+}
+
+function openHelp(id){
+  modalType='help'; modalId=id;
+  hChips=[]; hNote='';
+  showModal();
+}
+
+function openAdd(){
+  modalType='add'; modalId=null;
+  showModal();
+}
+
+function closeModal(){
+  document.getElementById('modal').style.display='none';
+  modalType=null; modalId=null;
+}
+
+function delTask(id){
+  custom=custom.filter(function(t){return String(t.id)!==String(id);});
+  delete done[id];
+  save(); toast('Removida.'); render();
+}
+
+function showModal(){
+  var box=document.getElementById('modal-box');
+  var t=modalId!=null?allT().find(function(x){return String(x.id)===String(modalId);}):null;
+  var html='';
+
+  if(modalType==='resch'){
+    html='<div class="mt">Reagendar tarefa</div><div class="ms">Ajuste a fase desta tarefa</div>';
+    html+='<div class="mn">'+t.title+'</div>';
+    html+='<label class="ml">Nova fase</label><select id="rp">';
+    Object.keys(PL).forEach(function(v){html+='<option value="'+v+'"'+(rPhase===v?' selected':'')+'>'+PL[v]+'</option>';});
+    html+='</select><label class="ml">Nota (opcional)</label><textarea id="rn" placeholder="Por que está reagendando?">'+rNote+'</textarea>';
+    html+='<div class="macts"><button class="mcc" onclick="closeModal()">Cancelar</button><button class="mok" onclick="doResch()">Confirmar</button></div>';
+  } else if(modalType==='help'){
+    html='<div class="mt">Pedir ajuda</div><div class="ms">O que você precisa?</div>';
+    html+='<div class="mn">'+t.title+'</div>';
+    html+='<label class="ml">Tipo de ajuda</label><div class="chips">';
+    CHIPS.forEach(function(c){html+='<button class="ch'+(hChips.indexOf(c)>=0?' on':'')+'" onclick="togChip(\''+c+'\')">'+c+'</button>';});
+    html+='</div><label class="ml">Contexto (opcional)</label><textarea id="hn" placeholder="Adicione contexto...">'+hNote+'</textarea>';
+    html+='<div class="macts"><button class="mcc" onclick="closeModal()">Cancelar</button><button class="mok" onclick="doHelp()">Enviar</button></div>';
+  } else if(modalType==='add'){
+    html='<div class="mt">Nova tarefa</div><div class="ms">Adicione ao seu cronograma</div>';
+    html+='<label class="ml">Título *</label><input type="text" id="at" placeholder="Ex: Aplicar para programa XYZ...">';
+    html+='<label class="ml">Descrição</label><textarea id="ad" placeholder="Detalhes, próximos passos..."></textarea>';
+    html+='<div class="g2"><div><label class="ml">Fase</label><select id="aph">';
+    Object.keys(PL).forEach(function(v){html+='<option value="'+v+'">'+PL[v]+'</option>';});
+    html+='</select></div><div><label class="ml">Categoria</label><select id="ac">';
+    Object.keys(CL).forEach(function(v){html+='<option value="'+v+'">'+CL[v]+'</option>';});
+    html+='</select></div></div>';
+    html+='<div class="g2"><div><label class="ml">Urgência</label><select id="au"><option value="hi">Alta</option><option value="md" selected>Média</option><option value="lo">Baixa</option></select></div>';
+    html+='<div><label class="ml">Prazo</label><input type="text" id="adl" placeholder="Ex: Jul 31"></div></div>';
+    html+='<div class="g2"><div><label class="ml">Tempo (horas)</label><input type="number" id="adur" min="0.25" step="0.25" placeholder="Ex: 2"></div>';
+    html+='<div><label class="ml">Frequência</label><select id="adt"><option value="único">Única</option><option value="semanal">Semanal</option><option value="diário">Diário</option></select></div></div>';
+    html+='<div class="macts"><button class="mcc" onclick="closeModal()">Cancelar</button><button class="mok" onclick="doAdd()">Adicionar</button></div>';
+  }
+
+  box.innerHTML=html;
+  document.getElementById('modal').style.display='flex';
+}
+
+function doResch(){
+  var rp=document.getElementById('rp');
+  var rn=document.getElementById('rn');
+  if(rp) resch[modalId]=rp.value;
+  if(rn&&rn.value.trim()) notes[modalId]=rn.value.trim();
+  save(); closeModal(); toast('Reagendado!'); render();
+}
+
+function togChip(c){
+  var i=hChips.indexOf(c);
+  if(i>=0) hChips.splice(i,1); else hChips.push(c);
+  showModal();
+}
+
+function doHelp(){
+  var hn=document.getElementById('hn');
+  var t=allT().find(function(x){return String(x.id)===String(modalId);});
+  var msg='Me ajuda com: "'+t.title+'"';
+  if(hChips.length) msg+='. Tipo: '+hChips.join(', ');
+  if(hn&&hn.value.trim()) msg+='. Contexto: '+hn.value.trim();
+  closeModal();
+  window.prompt('Copie e cole esta mensagem no Claude:',msg);
+}
+
+function doAdd(){
+  var at=document.getElementById('at');
+  if(!at||!at.value.trim()){toast('Adicione um título!');return;}
+  var ad=document.getElementById('ad');
+  var aph=document.getElementById('aph');
+  var ac=document.getElementById('ac');
+  var au=document.getElementById('au');
+  var adl=document.getElementById('adl');
+  var adur=document.getElementById('adur');
+  var adt=document.getElementById('adt');
+  custom.push({
+    id:'c'+(nid++),custom:true,
+    ph:aph?aph.value:'jun-jul',
+    cat:ac?ac.value:'cv',
+    urg:au?au.value:'md',
+    title:at.value.trim(),
+    desc:ad?ad.value.trim():'',
+    dl:adl&&adl.value?adl.value:'—',
+    dur:adur&&adur.value?parseFloat(adur.value):null,
+    dt:adt?adt.value:'único'
+  });
+  save(); closeModal(); toast('Tarefa adicionada!'); render();
+}
+
+function render(){
+  var tasks=allT();
+  var td=tasks.filter(function(t){return done[t.id];}).length;
+  var tu=tasks.filter(function(t){return t.urg==='hi'&&!done[t.id];}).length;
+  var hl=tasks.filter(function(t){return !done[t.id]&&t.dur&&t.dt==='único';}).reduce(function(s,t){return s+(t.dur||0);},0);
+  var pct=tasks.length?Math.round(td/tasks.length*100):0;
+
+  document.getElementById('s-done').textContent=td;
+  document.getElementById('s-total').textContent=tasks.length;
+  document.getElementById('s-urg').textContent=tu;
+  document.getElementById('s-hrs').textContent=hl%1===0?hl+'h':hl.toFixed(1)+'h';
+  document.getElementById('p-fill').style.width=pct+'%';
+  document.getElementById('p-pct').textContent=pct+'%';
+  document.getElementById('p-lbl').textContent=td+' / '+tasks.length+' tarefas';
+
+  ['jj','ag','so','nf'].forEach(function(k,i){
+    var ph=['jun-jul','agosto','set-out','nov-fev'][i];
+    document.getElementById('c-'+k).textContent=tasks.filter(function(t){return getP(t)===ph;}).length;
+  });
+  document.getElementById('c-all').textContent=tasks.length;
+
+  var phases=pf==='all'?['jun-jul','agosto','set-out','nov-fev']:[pf];
+  var filtered=tasks.filter(function(t){
+    if(pf!=='all'&&getP(t)!==pf) return false;
+    if(cf!=='all'&&t.cat!==cf) return false;
+    if(sf==='done'&&!done[t.id]) return false;
+    if(sf==='pending'&&done[t.id]) return false;
+    return true;
+  });
+
+  var html='';
+  phases.forEach(function(ph){
+    var pts=filtered.filter(function(t){return getP(t)===ph;});
+    if(!pts.length) return;
+    var dc=pts.filter(function(t){return done[t.id];}).length;
+    html+='<div class="ph-hdr"><div><div class="ph-title" style="color:'+PC[ph]+'">'+PL[ph]+'</div><div class="ph-sub">'+dc+'/'+pts.length+' concluídas</div></div><div class="ph-cnt">'+pts.length+'</div></div><div class="tasks">';
+    pts.forEach(function(t){
+      var isDone=!!done[t.id];
+      var d=durL(t);
+      var bw=t.dur?Math.min(100,Math.round((Math.min(t.dur,12)/12)*100)):0;
+      var tp=getP(t);
+      var nt=notes[t.id]||'';
+      var wr=resch[t.id]&&resch[t.id]!==t.ph;
+      html+='<div class="card'+(isDone?' done':'')+'">';
+      html+='<div class="cb'+(isDone?' on':'')+'" onclick="tick('+JSON.stringify(t.id)+')">'+(isDone?'✓':'')+'</div>';
+      html+='<div class="bd"><div class="tr">';
+      html+='<span class="ttl">'+t.title+'</span>';
+      html+='<span class="tag" style="background:'+PC[tp]+'22;color:'+PC[tp]+'">'+PL[tp]+'</span>';
+      html+='<span class="tag" style="background:'+CC[t.cat]+'22;color:'+CC[t.cat]+'">'+CL[t.cat]+'</span>';
+      if(d) html+='<span class="tag" style="background:rgba(196,181,253,.12);color:#c4b5fd">'+d+'</span>';
+      if(wr) html+='<span class="tag" style="background:rgba(196,181,253,.12);color:#c4b5fd">reagendado</span>';
+      if(t.custom) html+='<span class="tag" style="background:rgba(251,191,36,.1);color:#fbbf24">personalizada</span>';
+      html+='</div><div class="desc">'+t.desc+'</div>';
+      if(d) html+='<div class="dbar"><div class="dtrack"><div class="dfill" style="width:'+bw+'%"></div></div><span class="dlbl">'+d+'</span></div>';
+      if(nt) html+='<div class="nbox">Nota: '+nt+'</div>';
+      html+='<div class="acts">';
+      html+='<button class="ab" onclick="openHelp('+JSON.stringify(t.id)+')">? pedir ajuda</button>';
+      html+='<button class="ab" onclick="openResch('+JSON.stringify(t.id)+')">⟳ reagendar</button>';
+      if(t.custom) html+='<button class="ab red" onclick="delTask('+JSON.stringify(t.id)+')">✕ remover</button>';
+      html+='<span class="dl'+(t.urg==='hi'?' hi':t.urg==='md'?' md':'')+'">'+(t.urg==='hi'?'● ':'')+t.dl+'</span>';
+      html+='</div></div></div>';
+    });
+    html+='</div>';
+  });
+  if(!filtered.length) html='<div class="empty">Nenhuma tarefa com estes filtros.</div>';
+  document.getElementById('main').innerHTML=html;
+}
+
+render();
+</script>
+</body>
+</html>
